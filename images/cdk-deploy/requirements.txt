@@ -1,0 +1,11 @@
+virtualenv
+boto3
+aws-cdk.core
+aws-cdk.aws_s3
+aws-cdk.aws_fsx
+aws-cdk.aws_efs
+aws-cdk.aws_directoryservice
+aws-cdk.aws_secretsmanager
+aws-cdk.aws_datasync
+aws-cdk.aws_transfer
+aws-cdk.aws_ssm

@@ -16,7 +16,7 @@ Using the AWS Console [Delete the LogSharingBlog stack](https://docs.aws.amazon.
 
 ## How do I modify the template
 
-The Cloudformation template is generated through [AWS CDK](https://aws.amazon.com/cdk/). AWS Cloud Development Kit (AWS CDK) is an open source software development framework to define your cloud application resources using familiar programming languages.  This samples code is written in Python3 and available in [app.py](app.py).  Developers can either [install CDK](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) on their workstation, or use the [Docker-based build terminal](docker-deploy).  With Docker, teams get a consistent experience regardless of the local operating system (e.g., Windows versus OSX).
+The Cloudformation template is generated through [AWS CDK](https://aws.amazon.com/cdk/). AWS Cloud Development Kit (AWS CDK) is an open source software development framework to define your cloud application resources using familiar programming languages.  This code sample is written in Python3 and available in [app.py](app.py).  Developers can either [install CDK](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-python.html) on their workstation, or use the [Docker-based build terminal](docker-deploy).  With Docker, teams get a consistent experience regardless of the local operating system (e.g., Windows versus OSX).
 
 After making the relevant changes run the below commands:
 

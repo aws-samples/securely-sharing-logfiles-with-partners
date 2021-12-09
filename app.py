@@ -3,8 +3,12 @@ import builtins
 from os import environ, path
 from typing import List
 import aws_cdk as cdk
+from aws_cdk.aws_kms import Key
 from constructs import Construct
 from aws_cdk import (
+  Aws,
+  RemovalPolicy,
+  aws_logs as logs,
   aws_directoryservice as ad,
   aws_ssm as ssm,
   aws_fsx as fsx,
@@ -13,6 +17,7 @@ from aws_cdk import (
   aws_iam as iam,
   aws_datasync as ds,
   aws_ec2 as ec2,
+  aws_kms as kms,
   aws_ssm as ssm,
   aws_secretsmanager as sm,
   aws_transfer as tx,
@@ -64,13 +69,14 @@ class DirectoryServicesConstruct(Construct):
   """
   Represents the Active Directory Construct
   """
-  def __init__(self, scope: Construct, id: str, vpc:ec2.IVpc, subnet_group_name:str='Private', **kwargs) -> None:
+  def __init__(self, scope: Construct, id: str, vpc:ec2.IVpc, subnet_group_name:str='Private', encryption_key:kms.IKey=None, **kwargs) -> None:
     super().__init__(scope, id, **kwargs)
     cdk.Tags.of(self).add('Owner',DirectoryServicesConstruct.__name__)
 
     self.password = sm.Secret(self,'Password',
       description='Domain Admin Password',
-      generate_secret_string= sm.SecretStringGenerator())
+      generate_secret_string= sm.SecretStringGenerator(),
+      encryption_key=encryption_key)
 
     self.admin = 'Admin'
     self.mad = ad.CfnMicrosoftAD(self,'ActiveDirectory',
@@ -176,7 +182,11 @@ class FSxWindowsConstruct(Construct):
 class SharedLogBucket(Construct):
   def __init__(self, scope: Construct, id: builtins.str, vpc:ec2.IVpc) -> None:
     super().__init__(scope, id)
-    self.bucket = s3.Bucket(self,'Bucket', removal_policy=cdk.RemovalPolicy.DESTROY)
+    self.bucket = s3.Bucket(self,'Bucket', 
+      removal_policy=cdk.RemovalPolicy.DESTROY,
+      access_control= s3.BucketAccessControl.PRIVATE,
+      public_read_access=False,
+      encryption= s3.BucketEncryption.S3_MANAGED)
 
     '''
     Configure DataSync Locations
@@ -347,6 +357,11 @@ class LogSharingStack(cdk.Stack):
     super().__init__(scope,id, **kwargs)
     cdk.Tags.of(self).add(key='purpose', value='logshare-blog')
 
+    self.encryption_key = kms.Key(self,'SecretKey',
+      alias='sharing-logs/blog',
+      enable_key_rotation=True,
+      admins=[iam.AccountPrincipal(Aws.ACCOUNT_ID)])
+
     '''
     Create the networking layer
     '''
@@ -360,10 +375,19 @@ class LogSharingStack(cdk.Stack):
         ec2.SubnetConfiguration(name='Private',subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT,cidr_mask=24)
       ])
 
+    self.vpc.add_flow_log('VpcFlowLog',
+      destination= ec2.FlowLogDestination.to_cloud_watch_logs(
+        log_group= logs.LogGroup(self,'FlowLogGroup',
+          encryption_key= self.encryption_key,
+          removal_policy= RemovalPolicy.DESTROY,
+          retention= logs.RetentionDays.ONE_MONTH),
+        iam_role = iam.Role(self,'FlowLogRole',
+          assumed_by=iam.ServicePrincipal('vpc-flow-logs.amazonaws.com', region=Aws.REGION))))
+
     '''
     Setup Active Directory
     '''
-    self.directory = DirectoryServicesConstruct(self,'DirectoryServices', vpc=self.vpc)
+    self.directory = DirectoryServicesConstruct(self,'DirectoryServices', vpc=self.vpc, encryption_key=self.encryption_key)
 
     '''
     Create the data storage tier

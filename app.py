@@ -2,10 +2,11 @@
 import builtins
 from os import environ, path
 from typing import List
+import aws_cdk as cdk
+from constructs import Construct
 from aws_cdk import (
   aws_directoryservice as ad,
   aws_ssm as ssm,
-  core as cdk,
   aws_fsx as fsx,
   aws_efs as efs,
   aws_s3 as s3,
@@ -21,16 +22,12 @@ root_dir = path.dirname(__file__)
 DIRECTORY_NAME = "securely-sharing-logs.blog"
 DIRECTORY_SHORTNAME = "SHARINGLOGBLOG"
 
-# def inline_lambda_code(relpath:str)->lambda_.InlineCode:
-#   with open(path.join(root_dir, relpath), 'rt') as f:
-#     return lambda_.InlineCode.from_inline(f.read())
-
-class JoinDomainConstruct(cdk.Construct):
+class JoinDomainConstruct(Construct):
   @property
   def mad(self)->ad.CfnMicrosoftAD:
     return self.__mad
 
-  def __init__(self, scope: cdk.Construct, id: str, mad:ad.CfnMicrosoftAD, targets:List[str], **kwargs) -> None:
+  def __init__(self, scope: Construct, id: str, mad:ad.CfnMicrosoftAD, targets:List[str], **kwargs) -> None:
     super().__init__(scope, id, **kwargs)  
     self.__mad = mad
 
@@ -63,11 +60,11 @@ class JoinDomainConstruct(cdk.Construct):
     self.domain_join_document.add_depends_on(mad)
     self.association.add_depends_on(self.domain_join_document)
 
-class DirectoryServicesConstruct(cdk.Construct):
+class DirectoryServicesConstruct(Construct):
   """
   Represents the Active Directory Construct
   """
-  def __init__(self, scope: cdk.Construct, id: str, vpc:ec2.IVpc, subnet_group_name:str='Private', **kwargs) -> None:
+  def __init__(self, scope: Construct, id: str, vpc:ec2.IVpc, subnet_group_name:str='Private', **kwargs) -> None:
     super().__init__(scope, id, **kwargs)
     cdk.Tags.of(self).add('Owner',DirectoryServicesConstruct.__name__)
 
@@ -89,8 +86,8 @@ class DirectoryServicesConstruct(cdk.Construct):
 
     JoinDomainConstruct(self,'JoinDomain', mad=self.mad, targets=[self.mad.name, self.mad.short_name])
 
-class EFSConstruct(cdk.Construct):
-  def __init__(self, scope:cdk.Construct, id:str, vpc:ec2.IVpc, subnet_group_name:str='Private')->None:
+class EFSConstruct(Construct):
+  def __init__(self, scope:Construct, id:str, vpc:ec2.IVpc, subnet_group_name:str='Private')->None:
     super().__init__(scope, id)
 
     self.security_group = ec2.SecurityGroup(self, 'SecurityGroup',
@@ -123,8 +120,8 @@ class EFSConstruct(cdk.Construct):
         subnet_arn=DataSyncConstruct.subnet_arn(subnets[0])))
 
 
-class FSxWindowsConstruct(cdk.Construct):
-  def __init__(self, scope:cdk.Construct, id:str, vpc:ec2.IVpc, directory:DirectoryServicesConstruct, subnet_group_name:str='Private')->None:
+class FSxWindowsConstruct(Construct):
+  def __init__(self, scope:Construct, id:str, vpc:ec2.IVpc, directory:DirectoryServicesConstruct, subnet_group_name:str='Private')->None:
     super().__init__(scope, id)
 
     # https://docs.aws.amazon.com/fsx/latest/WindowsGuide/limit-access-security-groups.html
@@ -176,8 +173,8 @@ class FSxWindowsConstruct(cdk.Construct):
       password= directory.password.secret_value.to_string(),
       security_group_arns=[ DataSyncConstruct.sg_arn(self.security_group)])
 
-class SharedLogBucket(cdk.Construct):
-  def __init__(self, scope: cdk.Construct, id: builtins.str, vpc:ec2.IVpc) -> None:
+class SharedLogBucket(Construct):
+  def __init__(self, scope: Construct, id: builtins.str, vpc:ec2.IVpc) -> None:
     super().__init__(scope, id)
     self.bucket = s3.Bucket(self,'Bucket', removal_policy=cdk.RemovalPolicy.DESTROY)
 
@@ -194,8 +191,8 @@ class SharedLogBucket(cdk.Construct):
       s3_bucket_arn= self.bucket.bucket_arn,
       s3_config= ds.CfnLocationS3.S3ConfigProperty(bucket_access_role_arn=self.ds_role.role_arn))
 
-class TransferFamilyConstruct(cdk.Construct):
-  def __init__(self, scope: cdk.Construct, id: builtins.str, vpc:ec2.IVpc, mad:ad.CfnMicrosoftAD, bucket:s3.IBucket) -> None:
+class TransferFamilyConstruct(Construct):
+  def __init__(self, scope: Construct, id: builtins.str, vpc:ec2.IVpc, mad:ad.CfnMicrosoftAD, bucket:s3.IBucket) -> None:
     super().__init__(scope, id)
 
     self.security_group = ec2.SecurityGroup(self,'SecurityGroup',
@@ -221,8 +218,8 @@ class TransferFamilyConstruct(cdk.Construct):
         directory_id= mad.ref
       ))
 
-class DataStoresConstruct(cdk.Construct):
-  def __init__(self, scope: cdk.Construct, id: builtins.str, vpc:ec2.IVpc, directory:DirectoryServicesConstruct) -> None:
+class DataStoresConstruct(Construct):
+  def __init__(self, scope: Construct, id: builtins.str, vpc:ec2.IVpc, directory:DirectoryServicesConstruct) -> None:
     super().__init__(scope, id)
     assert not vpc is None, "Missing Vpc"
     assert not directory is None, "Missing Managed AD"
@@ -230,8 +227,8 @@ class DataStoresConstruct(cdk.Construct):
     self.efs_linux = EFSConstruct(self,'EFS', vpc=vpc)
     self.shared_log_bucket = SharedLogBucket(self,'LogBucket', vpc=vpc)
 
-class DataSyncConstruct(cdk.Construct):
-  def __init__(self, scope: cdk.Construct, id: builtins.str, data_stores:DataStoresConstruct) -> None:
+class DataSyncConstruct(Construct):
+  def __init__(self, scope: Construct, id: builtins.str, data_stores:DataStoresConstruct) -> None:
     super().__init__(scope, id)
 
     # https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
@@ -261,8 +258,8 @@ class DataSyncConstruct(cdk.Construct):
       id = security_group.security_group_id
     )
 
-class AppServersConstruct(cdk.Construct):
-  def __init__(self, scope: cdk.Construct, id: builtins.str, vpc:ec2.IVpc, data_stores:DataStoresConstruct) -> None:
+class AppServersConstruct(Construct):
+  def __init__(self, scope: Construct, id: builtins.str, vpc:ec2.IVpc, data_stores:DataStoresConstruct) -> None:
     super().__init__(scope, id)
     
     '''
@@ -360,7 +357,7 @@ class LogSharingStack(cdk.Stack):
       nat_gateways=1,
       subnet_configuration=[
         ec2.SubnetConfiguration(name='Public',subnet_type=ec2.SubnetType.PUBLIC,cidr_mask=24),
-        ec2.SubnetConfiguration(name='Private',subnet_type=ec2.SubnetType.PRIVATE,cidr_mask=24)
+        ec2.SubnetConfiguration(name='Private',subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT,cidr_mask=24)
       ])
 
     '''

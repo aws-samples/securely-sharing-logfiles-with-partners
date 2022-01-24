@@ -1,0 +1,1715 @@
+{
+  "Resources": {
+    "SecretKey573D36D8": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::397901422594:root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Create*",
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:Delete*",
+                "kms:TagResource",
+                "kms:UntagResource",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:ViaService": "secretsmanager.us-east-1.amazonaws.com"
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::397901422594:root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:CreateGrant",
+                "kms:DescribeKey"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "kms:ViaService": "secretsmanager.us-east-1.amazonaws.com"
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::397901422594:root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "EnableKeyRotation": true,
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/SecretKey/Resource"
+      }
+    },
+    "SecretKeyAliasC312C243": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/sharing-logs/blog",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "SecretKey573D36D8",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/SecretKey/Alias/Resource"
+      }
+    },
+    "Vpc8378EB38": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/22",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/Resource"
+      }
+    },
+    "VpcPublicSubnet1Subnet5C2D37C4": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/24",
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "AvailabilityZone": "us-east-1a",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/Subnet"
+      }
+    },
+    "VpcPublicSubnet1RouteTable6C95E38E": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/RouteTable"
+      }
+    },
+    "VpcPublicSubnet1RouteTableAssociation97140677": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E"
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/RouteTableAssociation"
+      }
+    },
+    "VpcPublicSubnet1DefaultRoute3DA9E72A": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C"
+        }
+      },
+      "DependsOn": [
+        "VpcVPCGWBF912B6E"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/DefaultRoute"
+      }
+    },
+    "VpcPublicSubnet1EIPD7E02669": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/EIP"
+      }
+    },
+    "VpcPublicSubnet1NATGateway4D7517AA": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4"
+        },
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "VpcPublicSubnet1EIPD7E02669",
+            "AllocationId"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet1/NATGateway"
+      }
+    },
+    "VpcPublicSubnet2Subnet691E08A3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "AvailabilityZone": "us-east-1b",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet2"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet2/Subnet"
+      }
+    },
+    "VpcPublicSubnet2RouteTable94F7E489": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PublicSubnet2"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet2/RouteTable"
+      }
+    },
+    "VpcPublicSubnet2RouteTableAssociationDD5762D8": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489"
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet2Subnet691E08A3"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet2/RouteTableAssociation"
+      }
+    },
+    "VpcPublicSubnet2DefaultRoute97F91067": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C"
+        }
+      },
+      "DependsOn": [
+        "VpcVPCGWBF912B6E"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PublicSubnet2/DefaultRoute"
+      }
+    },
+    "VpcPrivateSubnet1Subnet536B997A": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "AvailabilityZone": "us-east-1a",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PrivateSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet1/Subnet"
+      }
+    },
+    "VpcPrivateSubnet1RouteTableB2C5B500": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PrivateSubnet1"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet1/RouteTable"
+      }
+    },
+    "VpcPrivateSubnet1RouteTableAssociation70C59FA6": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500"
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet1/RouteTableAssociation"
+      }
+    },
+    "VpcPrivateSubnet1DefaultRouteBE02A9ED": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet1/DefaultRoute"
+      }
+    },
+    "VpcPrivateSubnet2Subnet3788AAA1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.3.0/24",
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "AvailabilityZone": "us-east-1b",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PrivateSubnet2"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet2/Subnet"
+      }
+    },
+    "VpcPrivateSubnet2RouteTableA678073B": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc/PrivateSubnet2"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet2/RouteTable"
+      }
+    },
+    "VpcPrivateSubnet2RouteTableAssociationA89CAD56": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B"
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet2/RouteTableAssociation"
+      }
+    },
+    "VpcPrivateSubnet2DefaultRoute060D2087": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/PrivateSubnet2/DefaultRoute"
+      }
+    },
+    "VpcIGWD7BA715C": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/IGW"
+      }
+    },
+    "VpcVPCGWBF912B6E": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "InternetGatewayId": {
+          "Ref": "VpcIGWD7BA715C"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/VPCGW"
+      }
+    },
+    "VpcVpcFlowLogB476133B": {
+      "Type": "AWS::EC2::FlowLog",
+      "Properties": {
+        "ResourceId": {
+          "Ref": "Vpc8378EB38"
+        },
+        "ResourceType": "VPC",
+        "TrafficType": "ALL",
+        "DeliverLogsPermissionArn": {
+          "Fn::GetAtt": [
+            "FlowLogRoleCB27E7DF",
+            "Arn"
+          ]
+        },
+        "LogDestinationType": "cloud-watch-logs",
+        "LogGroupName": {
+          "Ref": "FlowLogGroup3E25AA51"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/Vpc"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/Vpc/VpcFlowLog/FlowLog"
+      }
+    },
+    "FlowLogGroup3E25AA51": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "SecretKey573D36D8",
+            "Arn"
+          ]
+        },
+        "RetentionInDays": 30,
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/FlowLogGroup/Resource"
+      }
+    },
+    "FlowLogRoleCB27E7DF": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "vpc-flow-logs.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/FlowLogRole/Resource"
+      }
+    },
+    "FlowLogRoleDefaultPolicy9078999B": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "FlowLogGroup3E25AA51",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": "iam:PassRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "FlowLogRoleCB27E7DF",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "FlowLogRoleDefaultPolicy9078999B",
+        "Roles": [
+          {
+            "Ref": "FlowLogRoleCB27E7DF"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/FlowLogRole/DefaultPolicy/Resource"
+      }
+    },
+    "DirectoryServicesPassword47D7C3A3": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Description": "Domain Admin Password",
+        "GenerateSecretString": {},
+        "KmsKeyId": {
+          "Fn::GetAtt": [
+            "SecretKey573D36D8",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Owner",
+            "Value": "DirectoryServicesConstruct"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DirectoryServices/Password/Resource"
+      }
+    },
+    "DirectoryServicesActiveDirectoryD1169FBB": {
+      "Type": "AWS::DirectoryService::MicrosoftAD",
+      "Properties": {
+        "Name": "securely-sharing-logs.blog",
+        "Password": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "DirectoryServicesPassword47D7C3A3"
+              },
+              ":SecretString:::}}"
+            ]
+          ]
+        },
+        "VpcSettings": {
+          "SubnetIds": [
+            {
+              "Ref": "VpcPrivateSubnet1Subnet536B997A"
+            },
+            {
+              "Ref": "VpcPrivateSubnet2Subnet3788AAA1"
+            }
+          ],
+          "VpcId": {
+            "Ref": "Vpc8378EB38"
+          }
+        },
+        "Edition": "Standard",
+        "EnableSso": false,
+        "ShortName": "SHARINGLOGBLOG"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DirectoryServices/ActiveDirectory"
+      }
+    },
+    "DirectoryServicesJoinDomainJoinDomainDocument677D8AEE": {
+      "Type": "AWS::SSM::Document",
+      "Properties": {
+        "Content": {
+          "schemaVersion": "1.0",
+          "description": {
+            "Fn::Join": [
+              "",
+              [
+                "Domain Join ",
+                {
+                  "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+                }
+              ]
+            ]
+          },
+          "runtimeConfig": {
+            "aws:domainJoin": {
+              "properties": {
+                "directoryId": {
+                  "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+                },
+                "directoryName": "securely-sharing-logs.blog",
+                "dnsIpAddresses": {
+                  "Fn::GetAtt": [
+                    "DirectoryServicesActiveDirectoryD1169FBB",
+                    "DnsIpAddresses"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "Join_SecureLogSharing_Domain_",
+              {
+                "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+              }
+            ]
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Owner",
+            "Value": "DirectoryServicesConstruct"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "DependsOn": [
+        "DirectoryServicesActiveDirectoryD1169FBB"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DirectoryServices/JoinDomain/JoinDomainDocument"
+      }
+    },
+    "DirectoryServicesJoinDomainJoinTagAssociationA611B268": {
+      "Type": "AWS::SSM::Association",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "Join_SecureLogSharing_Domain_",
+              {
+                "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+              }
+            ]
+          ]
+        },
+        "AssociationName": {
+          "Fn::Join": [
+            "",
+            [
+              "joindomain_by_tags_",
+              {
+                "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+              }
+            ]
+          ]
+        },
+        "Targets": [
+          {
+            "Key": "tag:domain",
+            "Values": [
+              "securely-sharing-logs.blog",
+              "SHARINGLOGBLOG"
+            ]
+          }
+        ]
+      },
+      "DependsOn": [
+        "DirectoryServicesJoinDomainJoinDomainDocument677D8AEE"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DirectoryServices/JoinDomain/JoinTagAssociation"
+      }
+    },
+    "DataStoresFSXSecurityGroupCD804877": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "FSX for Windows SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock"
+              ]
+            },
+            "Description": "Allow FSx SMB Clients",
+            "FromPort": 445,
+            "IpProtocol": "tcp",
+            "ToPort": 445
+          },
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock"
+              ]
+            },
+            "Description": "Allow FSx Admins",
+            "FromPort": 5985,
+            "IpProtocol": "tcp",
+            "ToPort": 5985
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/FSX/SecurityGroup/Resource"
+      }
+    },
+    "DataStoresFSXFileSystemF45082E8": {
+      "Type": "AWS::FSx::FileSystem",
+      "Properties": {
+        "FileSystemType": "WINDOWS",
+        "SubnetIds": [
+          {
+            "Ref": "VpcPrivateSubnet1Subnet536B997A"
+          }
+        ],
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "DataStoresFSXSecurityGroupCD804877",
+              "GroupId"
+            ]
+          }
+        ],
+        "StorageCapacity": 32,
+        "StorageType": "SSD",
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "WindowsConfiguration": {
+          "ActiveDirectoryId": {
+            "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+          },
+          "AutomaticBackupRetentionDays": 30,
+          "CopyTagsToBackups": true,
+          "DeploymentType": "SINGLE_AZ_2",
+          "PreferredSubnetId": {
+            "Ref": "VpcPrivateSubnet1Subnet536B997A"
+          },
+          "ThroughputCapacity": 8,
+          "WeeklyMaintenanceStartTime": "1:11:00"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/FSX/FileSystem"
+      }
+    },
+    "DataStoresFSXFSXLocation3E1BB5D3": {
+      "Type": "AWS::DataSync::LocationFSxWindows",
+      "Properties": {
+        "FsxFilesystemArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:fsx:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":file-system/",
+              {
+                "Ref": "DataStoresFSXFileSystemF45082E8"
+              }
+            ]
+          ]
+        },
+        "Password": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "DirectoryServicesPassword47D7C3A3"
+              },
+              ":SecretString:::}}"
+            ]
+          ]
+        },
+        "SecurityGroupArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:ec2:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":",
+                {
+                  "Ref": "AWS::AccountId"
+                },
+                ":security-group/",
+                {
+                  "Fn::GetAtt": [
+                    "DataStoresFSXSecurityGroupCD804877",
+                    "GroupId"
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        "User": "Admin",
+        "Domain": "SHARINGLOGBLOG",
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/FSX/FSX-Location"
+      }
+    },
+    "DataStoresEFSSecurityGroup083E4E27": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Securely-Sharing-Logs/DataStores/EFS/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock"
+              ]
+            },
+            "Description": "Allow traffic to NFS",
+            "FromPort": 2049,
+            "IpProtocol": "tcp",
+            "ToPort": 2049
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/EFS/SecurityGroup/Resource"
+      }
+    },
+    "DataStoresEFSLinuxFileSystem68AF3189": {
+      "Type": "AWS::EFS::FileSystem",
+      "Properties": {
+        "BackupPolicy": {
+          "Status": "ENABLED"
+        },
+        "Encrypted": true,
+        "FileSystemTags": [
+          {
+            "Key": "Name",
+            "Value": "efs.securely-sharing-logs.blog"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "LifecyclePolicies": [
+          {
+            "TransitionToIA": "AFTER_14_DAYS"
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/EFS/LinuxFileSystem/Resource"
+      }
+    },
+    "DataStoresEFSLinuxFileSystemEfsMountTarget15CED313D": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "DataStoresEFSLinuxFileSystem68AF3189"
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "DataStoresEFSSecurityGroup083E4E27",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/EFS/LinuxFileSystem/EfsMountTarget1"
+      }
+    },
+    "DataStoresEFSLinuxFileSystemEfsMountTarget2E54B229E": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "DataStoresEFSLinuxFileSystem68AF3189"
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "DataStoresEFSSecurityGroup083E4E27",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/EFS/LinuxFileSystem/EfsMountTarget2"
+      }
+    },
+    "DataStoresEFSEFSLocationA5798A5A": {
+      "Type": "AWS::DataSync::LocationEFS",
+      "Properties": {
+        "Ec2Config": {
+          "SecurityGroupArns": [
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:aws:ec2:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":security-group/",
+                  {
+                    "Fn::GetAtt": [
+                      "DataStoresEFSSecurityGroup083E4E27",
+                      "GroupId"
+                    ]
+                  }
+                ]
+              ]
+            }
+          ],
+          "SubnetArn": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:ec2:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":",
+                {
+                  "Ref": "AWS::AccountId"
+                },
+                ":subnet/",
+                {
+                  "Ref": "VpcPrivateSubnet1Subnet536B997A"
+                }
+              ]
+            ]
+          }
+        },
+        "EfsFilesystemArn": {
+          "Fn::GetAtt": [
+            "DataStoresEFSLinuxFileSystem68AF3189",
+            "Arn"
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/EFS/EFS-Location"
+      }
+    },
+    "DataStoresLogBucketB36BAC02": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "AccessControl": "Private",
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/LogBucket/Bucket/Resource"
+      }
+    },
+    "DataStoresLogBucketDataSyncRole30B333C0": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "datasync.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonS3FullAccess"
+              ]
+            ]
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/LogBucket/DataSyncRole/Resource"
+      }
+    },
+    "DataStoresLogBucketS3Location6C208E08": {
+      "Type": "AWS::DataSync::LocationS3",
+      "Properties": {
+        "S3BucketArn": {
+          "Fn::GetAtt": [
+            "DataStoresLogBucketB36BAC02",
+            "Arn"
+          ]
+        },
+        "S3Config": {
+          "BucketAccessRoleArn": {
+            "Fn::GetAtt": [
+              "DataStoresLogBucketDataSyncRole30B333C0",
+              "Arn"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataStores/LogBucket/S3-Location"
+      }
+    },
+    "AppServersRole4B7CF446": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "ec2.",
+                      {
+                        "Ref": "AWS::URLSuffix"
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonSSMDirectoryServiceAccess"
+              ]
+            ]
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "domain",
+            "Value": "SHARINGLOGBLOG"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/Role/Resource"
+      }
+    },
+    "AppServersSecurityGroup602856CA": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Security Group for the AppServersConstruct",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock"
+              ]
+            },
+            "Description": "Allow incoming for ssh protocol",
+            "FromPort": 22,
+            "IpProtocol": "tcp",
+            "ToPort": 22
+          },
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock"
+              ]
+            },
+            "Description": "Allow incoming for rdp protocol",
+            "FromPort": 3389,
+            "IpProtocol": "tcp",
+            "ToPort": 3389
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "domain",
+            "Value": "SHARINGLOGBLOG"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/SecurityGroup/Resource"
+      }
+    },
+    "AppServersWindowsServerInstanceProfileB424F6DE": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "AppServersRole4B7CF446"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/WindowsServer/InstanceProfile"
+      }
+    },
+    "AppServersWindowsServer7DB4B2A171e0a72c44aca83a": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-1a",
+        "IamInstanceProfile": {
+          "Ref": "AppServersWindowsServerInstanceProfileB424F6DE"
+        },
+        "ImageId": {
+          "Ref": "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2016EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter"
+        },
+        "InstanceType": "t3.small",
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "AppServersSecurityGroup602856CA",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4"
+        },
+        "Tags": [
+          {
+            "Key": "domain",
+            "Value": "SHARINGLOGBLOG"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/AppServers/WindowsServer"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "<powershell></powershell>"
+        }
+      },
+      "DependsOn": [
+        "AppServersRole4B7CF446"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/WindowsServer/Resource"
+      }
+    },
+    "AppServersLinuxServerInstanceProfile08E720A0": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "AppServersRole4B7CF446"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/LinuxServer/InstanceProfile"
+      }
+    },
+    "AppServersLinuxServerA34808F171e0a72c44aca83a": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-1a",
+        "IamInstanceProfile": {
+          "Ref": "AppServersLinuxServerInstanceProfile08E720A0"
+        },
+        "ImageId": {
+          "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
+        },
+        "InstanceType": "t3.small",
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "AppServersSecurityGroup602856CA",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4"
+        },
+        "Tags": [
+          {
+            "Key": "domain",
+            "Value": "SHARINGLOGBLOG"
+          },
+          {
+            "Key": "Name",
+            "Value": "Securely-Sharing-Logs/AppServers/LinuxServer"
+          },
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "<powershell></powershell>"
+        }
+      },
+      "DependsOn": [
+        "AppServersRole4B7CF446"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/AppServers/LinuxServer/Resource"
+      }
+    },
+    "DataSyncEFSTaskC8B04223": {
+      "Type": "AWS::DataSync::Task",
+      "Properties": {
+        "DestinationLocationArn": {
+          "Ref": "DataStoresLogBucketS3Location6C208E08"
+        },
+        "SourceLocationArn": {
+          "Ref": "DataStoresEFSEFSLocationA5798A5A"
+        },
+        "Schedule": {
+          "ScheduleExpression": "rate(1 hour)"
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataSync/EFS-Task"
+      }
+    },
+    "DataSyncFSXTaskB8F72755": {
+      "Type": "AWS::DataSync::Task",
+      "Properties": {
+        "DestinationLocationArn": {
+          "Ref": "DataStoresLogBucketS3Location6C208E08"
+        },
+        "SourceLocationArn": {
+          "Ref": "DataStoresFSXFSXLocation3E1BB5D3"
+        },
+        "Schedule": {
+          "ScheduleExpression": "rate(1 hour)"
+        },
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/DataSync/FSX-Task"
+      }
+    },
+    "TxFSecurityGroup4906038D": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Security Group for the TransferFamilyConstruct",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/TxF/SecurityGroup/Resource"
+      }
+    },
+    "TxFTransferServer841EEE79": {
+      "Type": "AWS::Transfer::Server",
+      "Properties": {
+        "Domain": "S3",
+        "EndpointDetails": {
+          "SecurityGroupIds": [
+            {
+              "Fn::GetAtt": [
+                "TxFSecurityGroup4906038D",
+                "GroupId"
+              ]
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "VpcPublicSubnet1Subnet5C2D37C4"
+            },
+            {
+              "Ref": "VpcPublicSubnet2Subnet691E08A3"
+            }
+          ],
+          "VpcId": {
+            "Ref": "Vpc8378EB38"
+          }
+        },
+        "EndpointType": "VPC",
+        "IdentityProviderDetails": {
+          "DirectoryId": {
+            "Ref": "DirectoryServicesActiveDirectoryD1169FBB"
+          }
+        },
+        "IdentityProviderType": "AWS_DIRECTORY_SERVICE",
+        "Tags": [
+          {
+            "Key": "purpose",
+            "Value": "logshare-blog"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Securely-Sharing-Logs/TxF/TransferServer"
+      }
+    }
+  },
+  "Parameters": {
+    "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2016EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2016-English-Full-Base"
+    },
+    "SsmParameterValueawsserviceamiamazonlinuxlatestamznamihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2"
+    },
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}

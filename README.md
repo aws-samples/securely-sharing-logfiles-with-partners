@@ -4,11 +4,9 @@ Regulated environments prohibit DevOps teams from directly accessing their compu
 
 ## How do I deploy this code sample
 
-Customers can directly deploy the Cloudformation template through the AWS Console. Below are one-click launch buttons for the supported regions. For more information see [Creating a stack on the AWS CloudFormation console](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html).
+You can deploy the [cached Cloudformation template](Securely-Sharing-Logs.template.json) through the AWS Console. It supports most public regions. See [Creating a stack on the AWS CloudFormation console](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html) for more information.
 
-**Note**:  The first deployment will take 1-2 hours.  This requirement is due to deploying [AWS Managed AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html) and joining the example resources to the **securely-sharing-logs.blog** domain.  Customers can authenticate into the domain controller as **SHARINGLOGBLOG\Admin** using the password [retrieved from AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets.html).
-
-- [Launch in us-east-1](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.us-east-1.amazonaws.com/cloudformation-templates-us-east-1/WordPress_Single_Instance.template&stackName=LogSharingBlog)
+**Note**:  The first deployment will take 1-2 hours.  This requirement is due to deploying [AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html) and joining the example resources to the **securely-sharing-logs.blog** domain.  Customers can authenticate into the domain controller as **SHARINGLOGBLOG\Admin** using the password [retrieved from AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/retrieving-secrets.html).
 
 ## How do I remove this code sample
 
